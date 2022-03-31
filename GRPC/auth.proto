@@ -1,0 +1,46 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+option go_package = "GRPC/authProto";
+
+package auth;
+
+service Auth {
+  rpc GetUserWithRights(AccessToken) returns (UserRole) {}
+  rpc BindUserAndRole(User) returns (ResultBinding) {}
+  rpc TokenGenerationByRefresh(RefreshToken) returns (GeneratedTokens) {}
+  rpc TokenGenerationByUserId(User) returns (GeneratedTokens) {}
+  rpc GetAllRoles(google.protobuf.Empty) returns (Roles) {}
+}
+
+message UserRole {
+  int32 userId = 1;
+  string role = 2;
+  string permissions = 3;
+}
+
+message AccessToken {
+  string accessToken = 1;
+}
+
+message RefreshToken {
+  string refreshToken = 1;
+}
+
+message GeneratedTokens {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+
+message User {
+  int32 userId = 1;
+  string role = 2;
+}
+
+message ResultBinding {
+  bool result = 1;
+}
+
+message Roles {
+  string roles = 1;
+}

@@ -1,0 +1,374 @@
+definitions:
+  authProto.GeneratedTokens:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  handler.listUsers:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.ResponseUser'
+        type: array
+    type: object
+  model.AuthUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.CreateCustomer:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    type: object
+  model.CreateStaff:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    required:
+    - email
+    - role
+    type: object
+  model.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.MyTime:
+    properties:
+      time.Time:
+        type: string
+    type: object
+  model.ResponseUser:
+    properties:
+      created_at:
+        $ref: '#/definitions/model.MyTime'
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+    type: object
+  model.RestorePassword:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    type: object
+  model.UpdateUser:
+    properties:
+      email:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+info:
+  contact: {}
+  description: Authenticate Service for Food Delivery Application
+  title: Authenticate Service
+paths:
+  /users/:
+    get:
+      consumes:
+      - application/json
+      description: get list of users
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Role
+        in: query
+        name: role
+        type: string
+      - description: FilterData
+        in: query
+        name: filter_data
+        type: boolean
+      - description: ShowDeleted
+        in: query
+        name: show_deleted
+        type: boolean
+      - description: StartTime
+        in: query
+        name: start_time
+        type: string
+      - description: EndTime
+        in: query
+        name: end_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.listUsers'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: getUsers
+      tags:
+      - User
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete user by ID
+      parameters:
+      - description: User ID
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: deleteUserByID
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ResponseUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: getUser
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: change user password
+      parameters:
+      - description: User
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: updateUser
+      tags:
+      - User
+  /users/customer:
+    post:
+      consumes:
+      - application/json
+      description: create new customer
+      parameters:
+      - description: User
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateCustomer'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/authProto.GeneratedTokens'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: createCustomer
+      tags:
+      - User
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: check auth information
+      parameters:
+      - description: User
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.AuthUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authProto.GeneratedTokens'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: authUser
+      tags:
+      - Auth
+  /users/restorePassword:
+    post:
+      consumes:
+      - application/json
+      description: restore user password
+      parameters:
+      - description: Email
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.RestorePassword'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: restorePassword
+      tags:
+      - User
+  /users/staff:
+    post:
+      consumes:
+      - application/json
+      description: create new restaurant or courier manager or courier
+      parameters:
+      - description: User
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateStaff'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: createStaff
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
